@@ -30,8 +30,10 @@ class UsersController extends Controller
 
     public function show(User $user)
     {
-        $users = User::paginate(10  );
-        return view('users.index', compact('users'));
+        $statuses = $user->statuses()
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+        return view('users.show', compact('user', 'statuses'));
 
     }
     public function store(Request $request){
@@ -79,5 +81,18 @@ class UsersController extends Controller
         $user->delete();
         session()->flash('success', '成功删除用户！');
         return back();
+    }
+    public function followings(User $user)
+    {
+        $users = $user->followings()->paginate(30);
+        $title = '关注的人';
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function followers(User $user)
+    {
+        $users = $user->followers()->paginate(30);
+        $title = '粉丝';
+        return view('users.show_follow', compact('users', 'title'));
     }
 }
